@@ -31,14 +31,14 @@ function y_cal_install() {
 		'all_day_text' =>'All Day', // text to show if event is all day
 		'img_defaults' => array( // image defaults when image url is not given (unber refers to category id)
 			"byu" => plugins_url( "images/default/byu.jpg", __FILE__ ),
-			"70" => plugins_url( "images/default/cpms.jpg", __FILE__ ),
-			"72" => plugins_url( "images/default/chem.jpg", __FILE__ ),
-			"74" => plugins_url( "images/default/cs.jpg", __FILE__ ),
-			"75" => plugins_url( "images/default/geology.jpg", __FILE__ ),
-			"76" => plugins_url( "images/default/math.jpg", __FILE__ ),
-			"77" => plugins_url( "images/default/mathEd.jpg", __FILE__ ),
-			"78" => plugins_url( "images/default/physics.jpg", __FILE__ ),
-			"79" => plugins_url( "images/default/stats.jpg", __FILE__ ),
+			"288" => plugins_url( "images/default/cpms.jpg", __FILE__ ),
+			"275" => plugins_url( "images/default/chem.jpg", __FILE__ ),
+			"276" => plugins_url( "images/default/cs.jpg", __FILE__ ),
+			"277" => plugins_url( "images/default/geology.jpg", __FILE__ ),
+			"278" => plugins_url( "images/default/math.jpg", __FILE__ ),
+			"279" => plugins_url( "images/default/mathEd.jpg", __FILE__ ),
+			"280" => plugins_url( "images/default/physics.jpg", __FILE__ ),
+			"281" => plugins_url( "images/default/stats.jpg", __FILE__ ),
 		),
 		
 
