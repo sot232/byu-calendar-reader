@@ -151,7 +151,7 @@ function y_cal_install() {
 // showOnWidget - show on widget
 	$sql3 = "CREATE TABLE " . $options['table_name_events'] . " (
 		EventId int,
-		CategoryId int,
+		DeptId int,
 		dateAdded datetime,
 		pending tinyint(1),
 		showOnCalendar tinyint(1),
@@ -337,27 +337,27 @@ function y_cal_manage_event_table(){
 				WHERE EventId NOT IN (SELECT EventId FROM " . $options["table_name"] . ")";
 		$wpdb->query($strSQL);
 // Add new events to custom table
-	$strSQL =  "INSERT IGNORE INTO " . $options["table_name_events"] . " (EventId, CategoryId, dateAdded, pending, showOnWidget, showOnCalendar) 
-				SELECT EventId, CategoryId, NOW(), 0 AS pending , 1 AS showOnWidget , 1 AS showOnCalendar FROM " . $options["table_name"];
+	$strSQL =  "INSERT IGNORE INTO " . $options["table_name_events"] . " (EventId, DeptId, dateAdded, pending, showOnWidget, showOnCalendar) 
+				SELECT EventId, DeptId, NOW(), 0 AS pending , 1 AS showOnWidget , 1 AS showOnCalendar FROM " . $options["table_name"];
 		$wpdb->query($strSQL);
 // Auto not approved for widget
 	if ($options["auto_not_showWidget"] != "") {
 		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnWidget=0 
-			   WHERE CategoryId IN (" . $options["auto_not_showWidget"] . ") 
+			   WHERE DeptId IN (" . $options["auto_not_showWidget"] . ") 
 			   	AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
 	}	
 // Auto not approved for calendar
 	if ($options["auto_not_showCalendar"] != "") {
 		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnCalendar=0 
-				   WHERE CategoryId IN (" . $options["auto_not_showCalendar"] . ") 
+				   WHERE DeptId IN (" . $options["auto_not_showCalendar"] . ") 
 			   		AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
 	}
 // Auto not approved
 	if ($options["auto_not_approve"] != "") {
 		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET pending=1 
-				   WHERE CategoryId IN (" . $options["auto_not_approve"] . ") 
+				   WHERE DeptId IN (" . $options["auto_not_approve"] . ") 
 			   		AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
 	}
@@ -491,7 +491,7 @@ function widget_get_data($a) {
 
 		$strSQL = "SELECT * FROM " . $options['table_name'] ;	
 		$strSQL .= " LEFT JOIN " . $options['table_name_events'] . " ON " . $options['table_name'] .".EventID = " . $options['table_name_events'] . ".EventId ";
-		$strSQL .= " WHERE " . $options['table_name'] . ".CategoryID IN (". $a['id1'] .")";
+		$strSQL .= " WHERE " . $options['table_name'] . ".DeptID IN (". $a['id1'] .")";
 		$strSQL .= " AND DATE(StartDateTime) >= CURDATE()";
 		$strSQL .= " AND StartDateTime < NOW() + INTERVAL ". $options['widget_priority1_days'] ." DAY";
 		$strSQL .= " AND showOnWidget = 1 ";
@@ -512,7 +512,7 @@ function widget_get_data($a) {
 		
 		$strSQL = "SELECT * FROM " . $options['table_name'] ;
 		$strSQL .= " LEFT JOIN " . $options['table_name_events'] . " ON " . $options['table_name'] . ".EventID = " . $options['table_name_events'] . ".EventId ";
-		$strSQL .= " WHERE " . $options['table_name'] . ".CategoryID IN (" . $a['id2'] . ")";
+		$strSQL .= " WHERE " . $options['table_name'] . ".DeptID IN (" . $a['id2'] . ")";
 		$strSQL .= " AND DATE(StartDateTime) >= CURDATE()";
 		$strSQL .= " AND StartDateTime < NOW() + INTERVAL ". $options['widget_priority2_days'] ." DAY";
 		$strSQL .= " AND showOnWidget = 1 ";
@@ -532,13 +532,13 @@ function widget_get_data($a) {
 		$strSQL .= " WHERE showOnWidget = 1 ";
 
 			if ($a['id1'] !== '') {
-				$strSQL .= " AND " . $options['table_name'] . ".CategoryID NOT IN (". $a['id1'];
+				$strSQL .= " AND " . $options['table_name'] . ".DeptID NOT IN (". $a['id1'];
 				if($a['id2'] !== '') {
 					$strSQL .= "," . $a['id2'];
 				}
 				$strSQL .= ") ";
 			} else if ($a['id1'] == '' && $a['id2'] !== ''){
-				$strSQL .= " AND " . $options['table_name'] . ".CategoryID NOT IN (". $a['id2'] .") ";	
+				$strSQL .= " AND " . $options['table_name'] . ".DeptID NOT IN (". $a['id2'] .") ";	
 			}
 
 			if ($a['id1'] !== '' || $a['id2'] !== '') {
