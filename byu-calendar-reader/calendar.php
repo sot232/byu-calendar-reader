@@ -62,7 +62,7 @@ function getCalendarData($category_filter = "", $show_byu = false) {
 	$strSQL .= " WHERE " . $options['table_name_events'] . ".showOnCalendar=1";
 
 	if ($category_filter != "") {
-		$strSQL .= " AND " . $options['table_name'] . ".DeptId IN (" . $category_filter . ")";
+		$strSQL .= " AND " . $options['table_name'] . ".DeptIds IN (" . $category_filter . ")";
 		if ($show_byu) {
 			$strSQL .= " OR " . $options['table_name'] . ".IsPublishedNotMainCalendar=1";
 		}
