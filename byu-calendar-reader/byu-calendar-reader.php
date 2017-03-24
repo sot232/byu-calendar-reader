@@ -242,8 +242,8 @@ function y_cal_loadXML() {
 		$context  = stream_context_create(array('http' => array('header' => 'Accept: application/xml')));
 		
 		// have to do two queries so we get the right category for the child events. (ex: Geology shows up under CPMS otherwise)
-		$url1 = $options["byu_url"] . 'categories='. $options[first_query] . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
-		$url2 = $options["byu_url"] . 'categories='. $options[widget_categories2] . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
+		$url1 = $options["byu_url"] . 'categories=274' . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
+		$url2 = $options["byu_url"] . 'categories=all' . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
 
 		
 
