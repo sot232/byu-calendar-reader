@@ -64,10 +64,10 @@ function getCalendarData($category_filter = "", $show_byu = false) {
 	if ($category_filter != "") {
 		$strSQL .= " AND " . $options['table_name'] . ".DeptIds IN (" . $category_filter . ")";
 		if ($show_byu) {
-			$strSQL .= " OR " . $options['table_name'] . ".IsPublishedNotMainCalendar=1";
+			$strSQL .= " OR " . $options['table_name'] . ".DeptIds<>('288,275,276,277,278,279,280,281')";
 		}
 	} else if ($show_byu) {
-		$strSQL .= " AND " . $options['table_name'] . ".IsPublishedNotMainCalendar=1";
+		$strSQL .= " AND " . $options['table_name'] . ".DeptIds<>('288,275,276,277,278,279,280,281')";
 	}
    
 	$strSQL .= " ORDER BY " . $options['table_name'] . ".StartDateTime ASC ";
