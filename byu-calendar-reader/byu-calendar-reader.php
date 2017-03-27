@@ -46,7 +46,7 @@ function y_cal_install() {
 		'widget_2column' => false, // show widget in two columns (not showing in admin settings page)
 		'widget_howMany' => 5, // how many events to show on widget
 		'widget_categories1' => '288,275,276,277,278,279,280,281', // These categories will be the first to populate the widget
-		'widget_categories2' => '4,6,7,9,10,47,49,52', // This is second priority for events to show on widget
+		'widget_categories2' => '90', // This is second priority for events to show on widget
 		'widget_priority1_days' => 14, // Limits the amount of days to pull from priority 1 categories
 		'widget_priority2_days' => 14, // Limits the amount of days to pull from priority 2 categories
 		'widget_showTimeZone' => False, // Show timezone ALWAYS. if false, will only show timezone if different than home timezone
