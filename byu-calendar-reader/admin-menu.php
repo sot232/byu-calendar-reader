@@ -502,5 +502,3 @@ function y_cal_settings() {
 
 	<?php
 }
-	}
-}
