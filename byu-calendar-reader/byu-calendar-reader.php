@@ -1,6 +1,11 @@
 <?php
 
--/**
+defined('ABSPATH') or die("No script kiddies please!");
+
+require_once dirname( __FILE__ ) . '/widget.php';
+require_once dirname( __FILE__ ) . '/calendar.php';
+
+/**
  - * Plugin Name: BYU Calendar Reader (Ycal)
  - * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
  - * Description: Specificly made to import and show BYU calendar.
@@ -9,12 +14,6 @@
  - * Author URI: http://www.MattShurtz.com
  - * License: GPL2
  - */
-
-defined('ABSPATH') or die("No script kiddies please!");
-
-require_once dirname( __FILE__ ) . '/widget.php';
-require_once dirname( __FILE__ ) . '/calendar.php';
-
 
 global $YCal_db_version;
 global $table_name;
