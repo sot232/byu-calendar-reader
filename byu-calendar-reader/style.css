@@ -90,7 +90,7 @@
 }
 
 .Ycal-widget-image {
-	max-width: none;
+	max-width: 200px;
 	-webkit-border-radius: 6px;
 }
 
@@ -217,7 +217,7 @@
 }
 
 .Ycal-calendar-image {
-	max-width: none;
+	max-width: 200px;
 	-webkit-border-radius: 6px;
 }
 

@@ -6,30 +6,30 @@ require_once dirname( __FILE__ ) . '/widget.php';
 require_once dirname( __FILE__ ) . '/calendar.php';
 
 /**
-  * Plugin Name: BYU Calendar Reader (Ycal)
-  * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
-  * Description: Specificly made to import and show BYU calendar.
-  * Version: 1.0.0
-  * Author: Matthew Shurtz
-  * Author URI: http://www.MattShurtz.com
-  * License: GPL2
-  */
- 
-  /*  Copyright 2015  Matthew Shurtz  (email : shurtzm@byu.edu)
- 
-     This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License, version 2, as 
-     published by the Free Software Foundation.
- 
-     This program is distributed in the hope that it will be useful,
-     but WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     GNU General Public License for more details.
- 
-     You should have received a copy of the GNU General Public License
-     along with this program; if not, write to the Free Software
-     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * Plugin Name: BYU Calendar Reader (Ycal)
+ * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
+ * Description: Specificly made to import and show BYU calendar.
+ * Version: 1.0.0
+ * Author: Matthew Shurtz
+ * Author URI: http://www.MattShurtz.com
+ * License: GPL2
  */
+
+ /*  Copyright 2015  Matthew Shurtz  (email : shurtzm@byu.edu)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 global $YCal_db_version;
 global $table_name;
@@ -65,13 +65,13 @@ function y_cal_install() {
 			"280" => plugins_url( "images/default/physics.jpg", __FILE__ ),
 			"281" => plugins_url( "images/default/stats.jpg", __FILE__ ),
 		),
-		
+
 
 	// Widget Settings
 		'widget_2column' => false, // show widget in two columns (not showing in admin settings page)
 		'widget_howMany' => 5, // how many events to show on widget
 		'widget_categories1' => '288,275,276,277,278,279,280,281', // These categories will be the first to populate the widget
-		'widget_categories2' => '90', // This is second priority for events to show on widget
+		'widget_categories2' => '38', // This is second priority for events to show on widget
 		'widget_priority1_days' => 14, // Limits the amount of days to pull from priority 1 categories
 		'widget_priority2_days' => 14, // Limits the amount of days to pull from priority 2 categories
 		'widget_showTimeZone' => False, // Show timezone ALWAYS. if false, will only show timezone if different than home timezone
@@ -79,11 +79,11 @@ function y_cal_install() {
 		'widget_showEndTime' => False, // show end time on widget
 		'widget_showLocation' => True, // show location on widget
 		'widget_priority3' => True, // show
-		'widget_showUnfeatured' => False, // show unfeatured items after the first two prioeirtes (does not apply to the 2 priorities)
+		'widget_showUnfeatured' => False, // show unfeatured items after the first two priorities (does not apply to the 2 priorities)
 		'widget_showUnMainCalendar' => False, // show not on main calendar events (same idea as above)
 		'widget_showImage' => True, // show image on widget
 		'widget_imageSize' => '75px', // max image width on widget
-		
+
 	// Calendar Settings
 		'calendar_url' => '/calendar', // Wordpress url for calendar page
 		'calendar_imageSize' => '150px', // max image width on calendar
@@ -103,9 +103,9 @@ function y_cal_install() {
 		),
 		'calendar_filter_unfiltered_title' => "BYU", // filter name for unfilter
 
-	// Import Settings 
-		'first_query' => "288,275,276,277,278,279,280,281", // because of import settings on BYU's side, we need to first import children we want to specify with category id. Thus do these first.
-		'byu_url' =>'http://calendar-test.byu.edu/api/Events?', // url for uploading XML stuff
+	// Import Settings
+		'first_query' => "274", //This is the parent category to all categories used by CPMS 
+		'byu_url' =>'http://calendar.byu.edu/api/Events?', // url for uploading XML stuff
 		'getYears' => 1, // number of years to grab at import
 		'getMonths' => 0, // number of months to brab at import
 		'refresh_frequency' => 'hourly', // how often to refresh calendar info (re-import)
@@ -181,9 +181,9 @@ function y_cal_install() {
 		pending tinyint(1),
 		showOnCalendar tinyint(1),
 		showOnWidget tinyint(1),
-		forcePromote tinyint(1), 
+		forcePromote tinyint(1),
 		PRIMARY KEY  (EventId)
-	) $charset_collate;"; 
+	) $charset_collate;";
 
 // update databases as needed
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -193,7 +193,7 @@ function y_cal_install() {
 
 // add/edit database version stuff
 	add_option( 'YCal_db_version', $YCal_db_version );
-	update_option( "YCal_db_version", $YCal_db_version );	
+	update_option( "YCal_db_version", $YCal_db_version );
 
 // Create Scheduled Event to parse calendar
 	y_cal_refreshCRON();
@@ -216,7 +216,7 @@ function y_cal_refreshCRON() {
 		wp_clear_scheduled_hook( 'parse_cat_schedule' );
 	}
 	wp_schedule_event( time(), "daily", 'parse_cat_schedule');
-		
+
 }
 
 // Get categories from BYU
@@ -228,8 +228,8 @@ function y_cal_loadCategories(){
 
 	$context  = stream_context_create(array('http' => array('header' => 'Accept: application/xml')));
 	// URL to import from
-	$url = "http://calendar-test.byu.edu/api/AllCategories";
-	
+	$url = "http://calendar.byu.edu/api/AllCategories";
+
 	$xml = file_get_contents($url, false, $context);
 	$xml = simplexml_load_string($xml);
 
@@ -248,7 +248,7 @@ function y_cal_loadCategories(){
 			'ParentCategoryId' => $category->ParentCategoryId,
 			'doNotDisplayOnHomePage' => (int) filter_var($category->doNotDisplayOnHomePage, FILTER_VALIDATE_BOOLEAN)
 		);
-		
+
 		$wpdb->insert($table,$current);
 	}
 
@@ -262,15 +262,15 @@ function y_cal_loadXML() {
 
 	$table_name = $wpdb->prefix . $table_name;
 
-	$options = get_option('YCal_Options');		
+	$options = get_option('YCal_Options');
 
 		$context  = stream_context_create(array('http' => array('header' => 'Accept: application/xml')));
-		
+
 		// have to do two queries so we get the right category for the child events. (ex: Geology shows up under CPMS otherwise)
 		$url1 = $options["byu_url"] . 'categories=274' . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
-		$url2 = $options["byu_url"] . 'categories=all' . '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
+		$url2 = $options["byu_url"] . 'categories=all'. '&event[min][date]=' . date('Y-m-d') . '&event[max][date]=' . date("Y-m-d", mktime(0, 0, 0, date("m")+$options["getMonths"],   date("d"),   date("Y")+$options["getYears"]));
 
-		
+
 
 		$xml1 = file_get_contents($url1, false, $context);
 		$xml1 = simplexml_load_string($xml1);
@@ -279,7 +279,7 @@ function y_cal_loadXML() {
 		$xml2 = simplexml_load_string($xml2);
 
 		$events = array();
-		
+
 		$wpdb->query ('DELETE FROM ' . $table_name);
 
 		for ($i = 0; $i < 2; $i++) {
@@ -329,7 +329,7 @@ function y_cal_loadXML() {
 					'TagsNames' => $event->TagsNames,
 					'Title' => $event->Title
 				);
-			
+        
 			// Get category name and add it to database
 				if ($current['CategoryName']=="") {
 					$current['CategoryName'] = $wpdb->get_var('SELECT name FROM '.$options['table_name_categories']. ' WHERE CategoryId='. $current['CategoryId']);
@@ -340,7 +340,7 @@ function y_cal_loadXML() {
 					// insert into database
 					$wpdb->insert($table_name,$current);
 				}
-				
+
 			}
 		}
 
@@ -358,38 +358,38 @@ function y_cal_manage_event_table(){
 	$options = get_option('YCal_Options');
 
 // Remove past events
-	$strSQL =  "DELETE FROM " . $options["table_name_events"] . "  
+	$strSQL =  "DELETE FROM " . $options["table_name_events"] . "
 				WHERE EventId NOT IN (SELECT EventId FROM " . $options["table_name"] . ")";
 		$wpdb->query($strSQL);
 // Add new events to custom table
-	$strSQL =  "INSERT IGNORE INTO " . $options["table_name_events"] . " (EventId, DeptsId, dateAdded, pending, showOnWidget, showOnCalendar) 
-				SELECT EventId, DeptIds, NOW(), 0 AS pending , 1 AS showOnWidget , 1 AS showOnCalendar FROM " . $options["table_name"];
+	$strSQL =  "INSERT IGNORE INTO " . $options["table_name_events"] . " (EventId, CategoryId, DeptIds, dateAdded, pending, showOnWidget, showOnCalendar)
+				SELECT EventId, CategoryId, DeptIds, NOW(), 0 AS pending , 1 AS showOnWidget , 1 AS showOnCalendar FROM " . $options["table_name"];
 		$wpdb->query($strSQL);
 // Auto not approved for widget
 	if ($options["auto_not_showWidget"] != "") {
-		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnWidget=0 
-			   WHERE DeptIds IN (" . $options["auto_not_showWidget"] . ") 
+		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnWidget=0
+			   WHERE DeptIds IN (" . $options["auto_not_showWidget"] . ")
 			   	AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
-	}	
+	}
 // Auto not approved for calendar
 	if ($options["auto_not_showCalendar"] != "") {
-		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnCalendar=0 
-				   WHERE DeptIds IN (" . $options["auto_not_showCalendar"] . ") 
+		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET showOnCalendar=0
+				   WHERE DeptIds IN (" . $options["auto_not_showCalendar"] . ")
 			   		AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
 	}
 // Auto not approved
 	if ($options["auto_not_approve"] != "") {
-		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET pending=1 
-				   WHERE DeptIds IN (" . $options["auto_not_approve"] . ") 
+		$strSQL =  "UPDATE " . $options["table_name_events"] . " SET pending=1
+				   WHERE DeptIds IN (" . $options["auto_not_approve"] . ")
 			   		AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 		$wpdb->query($strSQL);
 	}
 
 // Check for new pending
-	$strSQL =  "SELECT EventId  FROM " . $options["table_name_events"] . " 
-				WHERE pending = 1 
+	$strSQL =  "SELECT EventId  FROM " . $options["table_name_events"] . "
+				WHERE pending = 1
 			   	AND dateAdded > NOW() - INTERVAL 2 MINUTE";
 	$results = $wpdb->get_results($strSQL,'ARRAY_A');
 	$new_pending = $wpdb->num_rows;
@@ -398,9 +398,9 @@ function y_cal_manage_event_table(){
 		$to = $options['pending_email'];
 		$subject = "YCal: Pending Events";
 		$message = "There " . ($new_pending == 1 ? 'is' : 'are') . " " . $new_pending . " new pending " . ($new_pending == 1 ? 'event' : 'events') . " to approve on the CPMS website:<br><br>";
-				    	
+
 		// foreach ($results as $pending) {
-		// 	$message .= "<li>" . $results["Title"] . " | " . $results["CategoryName"] . " | " .$results["StartDateTime"] . "</li>"; 
+		// 	$message .= "<li>" . $results["Title"] . " | " . $results["CategoryName"] . " | " .$results["StartDateTime"] . "</li>";
 		// }
 
 		$headers = array('Content-Type: text/html; charset=UTF-8');
@@ -426,6 +426,7 @@ function y_cal_pluginUninstall() {
 	 $wpdb->query("DROP TABLE IF EXISTS " . $options['table_name']);
 	 $wpdb->query("DROP TABLE IF EXISTS " . $options["table_name_categories"]);
 //	 $wpdb->query("DROP TABLE IF EXISTS " . $options["table_name_events"]);
+// Last line is commented out to hold events and reduce cost of reactivation.
 
 // Clear Scheduled Event to parse calendar & categories
 	 wp_clear_scheduled_hook( 'parse_schedule' );
@@ -439,7 +440,7 @@ function y_cal_prefix_add_my_stylesheet() {
     // Respects SSL, Style.css is relative to the current file
     wp_register_style( 'prefix-style', plugins_url('style.css', __FILE__) );
     wp_enqueue_style( 'prefix-style' );
-    
+
 }
 
 
@@ -448,7 +449,7 @@ function y_cal_install_options($option_name, $should_be){
 		add_option($option_name, $should_be);
 	} else {
 		$current = get_option($option_name);
-		
+
 		foreach ($should_be as $key => $value) {
 			if (array_key_exists($key,$current)) {
 				$should_be[$key] = $current[$key];
@@ -476,7 +477,7 @@ function getOccurances($array) {
         $string .= $array[$i]['OccurrenceId'];
         if($i < count($array)-1) {
         	$string .= ",";
-        }        
+        }
     }
 
     if($string=="")
@@ -499,7 +500,7 @@ function widget_get_data($a) {
 
 // GET FORCED PRIOITY
 
-		$strSQL = "SELECT * FROM " . $options['table_name'] ;	
+		$strSQL = "SELECT * FROM " . $options['table_name'] ;
 		$strSQL .= " LEFT JOIN " . $options['table_name_events'] . " ON " . $options['table_name'] .".EventID = " . $options['table_name_events'] . ".EventId ";
 		$strSQL .= " WHERE forcePromote <= NOW() AND forcePromote != CONVERT(0,DATETIME)";
 		$strSQL .= " AND DATE(StartDateTime) >= CURDATE()";
@@ -514,7 +515,7 @@ function widget_get_data($a) {
 // GET FIRST PRIORITY
 	if($a['id1'] !== '') {
 
-		$strSQL = "SELECT * FROM " . $options['table_name'] ;	
+		$strSQL = "SELECT * FROM " . $options['table_name'] ;
 		$strSQL .= " LEFT JOIN " . $options['table_name_events'] . " ON " . $options['table_name'] .".EventID = " . $options['table_name_events'] . ".EventId ";
 		$strSQL .= " WHERE " . $options['table_name'] . ".DeptIds IN (". $a['id1'] .")";
 		$strSQL .= " AND DATE(StartDateTime) >= CURDATE()";
@@ -529,12 +530,12 @@ function widget_get_data($a) {
 
 		$results = array_merge($results, $results1);
 
-		
+
 	}
-	
+
 // GET SECOND PRIORITY
 	if ($a['id2'] !== '' && ($a['events'] - sizeof($results)) > 0) {
-		
+
 		$strSQL = "SELECT * FROM " . $options['table_name'] ;
 		$strSQL .= " LEFT JOIN " . $options['table_name_events'] . " ON " . $options['table_name'] . ".EventID = " . $options['table_name_events'] . ".EventId ";
 		$strSQL .= " WHERE " . $options['table_name'] . ".DeptIds IN (" . $a['id2'] . ")";
@@ -563,7 +564,7 @@ function widget_get_data($a) {
 				}
 				$strSQL .= ") ";
 			} else if ($a['id1'] == '' && $a['id2'] !== ''){
-				$strSQL .= " AND " . $options['table_name'] . ".DeptIds NOT IN (". $a['id2'] .") ";	
+				$strSQL .= " AND " . $options['table_name'] . ".DeptIds NOT IN (". $a['id2'] .") ";
 			}
 
 			if ($a['id1'] !== '' || $a['id2'] !== '') {
@@ -575,7 +576,7 @@ function widget_get_data($a) {
 					if (!$options["widget_showUnfeatured"]) {
 						$strSQL .= " AND ";
 					}
-					$strSQL .= " IsPublishedNotMainCalendar = 0 ";
+					$strSQL .= " IsPublishedNotMainCalendar = 1 ";
 				}
 			} else if (!$options["widget_showUnfeatured"] || !$options["widget_showUnMainCalendar"]) {
 				$strSQL .= " AND ";
@@ -588,7 +589,7 @@ function widget_get_data($a) {
 					}
 					$strSQL .= " IsPublishedNotMainCalendar = 1 ";
 				}
-			}		
+			}
 		$strSQL .= " AND OccurrenceId NOT IN (".getOccurances($results).")";
 		$strSQL .= " ORDER BY  StartDateTime ASC ";
 		$strSQL .= " LIMIT " . ($a['events'] - sizeof($results));
@@ -604,7 +605,7 @@ function widget_get_data($a) {
 		}
 		return ($a['StartDateTime'] < $b['StartDateTime']) ? -1 : 1;
 	}
-	
+
 // sort the results
 	usort($results,"result_sort");
 
@@ -616,7 +617,7 @@ function widget_get_data($a) {
 function add_plugin_caps() {
     // gets the author role
     $role = get_role( 'administrator' );
- 
+
     $role->add_cap( 'edit_calendar' );
 }
 add_action( 'admin_init', 'add_plugin_caps');

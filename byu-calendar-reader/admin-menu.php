@@ -17,6 +17,10 @@ function y_cal_menu_function() {
 //Settings for auto pending/showing options
 function y_cal_manage_events() {
 	//Check for editing permissions
+
+	$file = plugin_dir_path( __FILE__ ) . '/test.txt';
+    file_put_contents($file, "Hello World!"); 
+
 	if (!current_user_can( 'edit_calendar')) {
 		wp_die(__( 'You do not have permission to manage calendar events'));
 	}
@@ -30,7 +34,7 @@ function y_cal_manage_events() {
 
 	//See if the user has posted any information
 	//If they did, this hidden field will be set to 'Y'
-	if( isset($_POST[ $hidden_field]) && $_POST[ $hidden_field == 'Y']) {
+	if( isset($_POST['hidden_field'])) {
 		//Read posted values and update options
 		foreach ($_POST as $key => $value){
 			//This part goes through the post array and grabs the settings for the individual events.
@@ -64,7 +68,7 @@ function y_cal_manage_events() {
     ?>
     	<div class="updated"><p><strong><?php _e('Settings Saved.', 'menu-test' ); ?></strong></p></div>
     <?php
-    
+
     	}
 
 
@@ -74,16 +78,16 @@ function y_cal_manage_events() {
     		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 			<!-- DataTables CSS -->
 			<link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
-			  
+
 			<!-- jQuery -->
 			<script type="text/javascript" charset="utf8" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-			  
+
 			<!-- DataTables -->
 			<script type="text/javascript" charset="utf8" src="http://cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
 		<hr />
 
-	<form method="post" action="">	
-	<input type="hidden" name="<?php echo $hidden_field; ?>" value="Y">
+	<form method="post" action="">
+	<input type="hidden" name="hidden_field" value="Y">
 <?php
 	//Get pending events
 	$options = get_option('YCal_Options');
@@ -97,19 +101,19 @@ function y_cal_manage_events() {
 	//get list of titles currently showing on widget
 	$widget_data = widget_get_data($a);
 	$showing_on_widget = array();
-	foreach ($widget_data as $value) {		
+	foreach ($widget_data as $value) {
 		array_push($showing_on_widget,$value['Title']);
 	}
 
 	$results = $wpdb->get_results('SELECT * FROM '.$options['table_name_events'].'
-						LEFT JOIN '.$options['table_name'].' ON '.$options['table_name_events'].'.EventId = '.$options['table_name'].'.EventId 
+						LEFT JOIN '.$options['table_name'].' ON '.$options['table_name_events'].'.EventId = '.$options['table_name'].'.EventId
 						WHERE pending=1', ARRAY_A);
 
 	//If pending events, show on table
 		if(count($results) > 0) {
-?>
+$hidden_field = "Y";?>
 		<h3> Pending </h3>
-			
+
 				<table id="pending" class="order-column" cellspacing="0" width="100%">
 			        <thead>
 			            <tr>
@@ -121,7 +125,7 @@ function y_cal_manage_events() {
 			                <th>Pending</th>
 			            </tr>
 			        </thead>
-			 
+
 			        <tfoot>
 			            <tr>
 			                <th>Event</th>
@@ -132,14 +136,14 @@ function y_cal_manage_events() {
 			                <th>Pending</th>
 			            </tr>
 			        </tfoot>
-			 
+
 			        <tbody>
 
-			        	<?php 
+			        	<?php
 			        		global $wpdb;
 			        		$last_eventId = 0;
 			        		$options = get_option('YCal_Options');
-			        		foreach ($results as $row) { 
+			        		foreach ($results as $row) {
 								if ($row['EventId'] == $last_eventId) continue;
 								$last_eventId = $row['EventId'];
 							?>
@@ -147,11 +151,11 @@ function y_cal_manage_events() {
 					                <td><a href='<?php echo $options['calendar_url'] . "?event=" .$row['OccurrenceId'] ?>' target="_blank"><?php echo $row['Title'] ?></a></td>
 					                <td><?php echo $row['CategoryName'] ?></td>
 					                <td><?php echo $row['StartDateTime'] ?></td>
-					               	<td><?php echo "<input type='radio' name='showCalendarChk_".$row['EventId']."' value=1 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnCalendar'], 1, false ) .">Show | 
+					               	<td><?php echo "<input type='radio' name='showCalendarChk_".$row['EventId']."' value=1 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnCalendar'], 1, false ) .">Show |
 					                				<input type='radio' name='showCalendarChk_".$row['EventId']."' value=0 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnCalendar'], 0, false ) .">Hide" ?></td>
-					                <td><?php echo "<input type='radio' name='showWidgetChk_".$row['EventId']."' value=1 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnWidget'], 1, false ) .">Show | 
+					                <td><?php echo "<input type='radio' name='showWidgetChk_".$row['EventId']."' value=1 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnWidget'], 1, false ) .">Show |
 					                				<input type='radio' name='showWidgetChk_".$row['EventId']."' value=0 onClick='radio_change(\"".$row['EventId']."\")' ". checked( $row['showOnWidget'], 0, false ) .">Hide" ?></td>
-					                <td><?php echo "<input type='radio' name='pendingChk_".$row['EventId']."' value=1 ". checked( $row['pending'], 1, false ) .">Pending | 
+					                <td><?php echo "<input type='radio' name='pendingChk_".$row['EventId']."' value=1 ". checked( $row['pending'], 1, false ) .">Pending |
 					                				<input type='radio' name='pendingChk_".$row['EventId']."' value=0 ". checked( $row['pending'], 0, false ) .">Done" ?></td>
 					            </tr>
 							<?php }
@@ -172,13 +176,13 @@ function y_cal_manage_events() {
 					<p class="description">
 						Pending: This column is used to manage pending events. After you have confirmed the proper settings for an event, you can set this column to done. Those events marked as done will no longer show on the Pending list (after Saving Changes).
 					</p>
-				
-			
+
+
 <?php } else { //end of if statement for if there are pending things ?>
 		<h3> Pending </h3><p>No Pending Events...</p>
-<?php } 
+<?php }
 	//Now show all events not pending
-?>
+$hidden_field = "Y"; ?>
 			<hr />
 
 			<h3> All Events </h3>
@@ -193,7 +197,7 @@ function y_cal_manage_events() {
 			                <th>Force Promote</th>
 			            </tr>
 			        </thead>
-			 
+
 			        <tfoot>
 			            <tr>
 			                <th>Event</th>
@@ -204,28 +208,28 @@ function y_cal_manage_events() {
 			                <th>Force Promote</th>
 			            </tr>
 			        </tfoot>
-			 
+
 			        <tbody>
 
-			        	<?php 
+			        	<?php
 			        		//Get all events not pending
 			        		$last_eventId = 0;
 			        			$results = $wpdb->get_results('SELECT * FROM '.$options['table_name_events'].'
-							LEFT JOIN '.$options['table_name'].' ON '.$options['table_name_events'].'.EventId = '.$options['table_name'].'.EventId 
+							LEFT JOIN '.$options['table_name'].' ON '.$options['table_name_events'].'.EventId = '.$options['table_name'].'.EventId
 							WHERE pending=0', ARRAY_A);
 			        		//Show on table
-							foreach ($results as $row) { 
+							foreach ($results as $row) {
 								//if eventID is already on table, dont show it (removes duplicates)
 								if ($row['EventId'] == $last_eventId) continue;
-								$last_eventId = $row['EventId'];							
+								$last_eventId = $row['EventId'];
 							?>
 								<tr>
 					                <td><a href='<?php echo $options['calendar_url'] . "?event=" .$row['OccurrenceId'] ?>' target="_blank"><?php echo $row['Title'] ?></a></td>
 					                <td><?php echo $row['CategoryName'] ?></td>
 					                <td><?php echo $row['StartDateTime'] ?></td>
-					                <td><?php echo "<input type='radio' name='showCalendarChk_".$row['EventId']."' value=1 ". checked( $row['showOnCalendar'], 1, false ) .">Show | 
+					                <td><?php echo "<input type='radio' name='showCalendarChk_".$row['EventId']."' value=1 ". checked( $row['showOnCalendar'], 1, false ) .">Show |
 					                				<input type='radio' name='showCalendarChk_".$row['EventId']."' value=0 ". checked( $row['showOnCalendar'], 0, false ) .">Hide" ?></td>
-					                <td><?php echo "<input type='radio' name='showWidgetChk_".$row['EventId']."' value=1 ". checked( $row['showOnWidget'], 1, false ) .">Show | 
+					                <td><?php echo "<input type='radio' name='showWidgetChk_".$row['EventId']."' value=1 ". checked( $row['showOnWidget'], 1, false ) .">Show |
 					                				<input type='radio' name='showWidgetChk_".$row['EventId']."' value=0 ". checked( $row['showOnWidget'], 0, false ) .">Hide" ?> <?php echo (in_array($row['Title'], $showing_on_widget)) ? "<i class='fa fa-eye fa-fw'></i>" : "" ?></td>
 					            	<td><?php echo "<input type='date' name='forcePromote_".$row['EventId']."' value='".$row['forcePromote']."'>"?></td>
 					            </tr>
@@ -245,7 +249,7 @@ function y_cal_manage_events() {
 						Homepage: This column enables you to either show or hide the event on the homepage widget. The eye icon identifies the events currently showing on the homepage widget.
 					</p>
 					<p class="description">
-						Force Promote: This column enables you to forcefully show an event on the homepage widget. Set the field to the date you want the event to first show up on the homepage widget. If more forced promoted events are selected (for a given time period) than spots available on the widget, then it will prioritize according to date of event (not forced promote date). Events will not show if homepage widget show/hide setting is set to 'Hide'. 
+						Force Promote: This column enables you to forcefully show an event on the homepage widget. Set the field to the date you want the event to first show up on the homepage widget. If more forced promoted events are selected (for a given time period) than spots available on the widget, then it will prioritize according to date of event (not forced promote date). Events will not show if homepage widget show/hide setting is set to 'Hide'.
 					</p>
 
 
@@ -266,13 +270,13 @@ function y_cal_manage_events() {
 					<p class="description">
 						If you want to mark certin category events for review as they are loaded into the system enter the category(s) here in a comma dilimited format.
 					</p>
-					
+
 				</p>
 				<p class="submit">
 					<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Save Changes') ?>" />
 				</p>
 
-			    <script>    
+			    <script>
 			    // Loads tables (with sort order)
 			    	$(document).ready(function() {
 					    $('#pending').dataTable( {
@@ -291,7 +295,7 @@ function y_cal_manage_events() {
 			</div>
 
 		</form>
-		
+
 <?php
 }
 
@@ -301,7 +305,7 @@ function y_cal_settings() {
 	if ( !current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
-	    
+
 	$hidden_field_name = "hide_me";
 
     // Read in existing option value from database
@@ -310,7 +314,7 @@ function y_cal_settings() {
     // See if the user has posted us some information
     // If they did, this hidden field will be set to 'Y'
     if( isset($_POST[ $hidden_field_name ]) && $_POST[ $hidden_field_name ] == 'Y' ) {
-        
+
         // Read their posted values and update options
         $options["widget_categories1"] = $_POST["widget_categories1"];
         $options["widget_categories2"] = $_POST["widget_categories2"];
@@ -347,7 +351,7 @@ function y_cal_settings() {
         	y_cal_loadXML();
         	y_cal_loadCategories();
         }
-        
+
 
 // Put an settings updated message on the screen
 	?>
@@ -365,13 +369,13 @@ function y_cal_settings() {
 	    echo "<h2>" . __( 'BYU Calendar Reader Settings', 'menu-test' ) . "</h2>";
 
 	    // settings form
-	    
+
 	    ?>
 
 			<form name="form1" method="post" action="">
 			<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="Y">
 
-			
+
 				<h3>Importing Settings</h3>
 
 				<p>Last Updated: <?php echo date(DATE_RFC2822, $options["last_updated"]); ?>
@@ -388,14 +392,14 @@ function y_cal_settings() {
 				<input type="radio" name="frequency" value="daily" <?php checked( $options['refresh_frequency'], "daily" ); ?>>Daily
 				</p>
 				<p class="description">
-						How often we automaticly pull from BYU Calendar 
+						How often we automaticly pull from BYU Calendar
 				</p>
-			
+
 			<hr />
 				<h3>General Settings</h3>
 				<p>All Day Text:
 					<input type="text" name="all_day_text" value="<?php echo $options["all_day_text"]; ?>" size="20">
-					
+
 					<p class="description">This is the text that will show instead of the time if the event is marked as an all day event</p>
 				</p>
 			<hr />
@@ -405,25 +409,25 @@ function y_cal_settings() {
 				</p>
 				<p>Show Image
 						<input type="checkbox" name="widget_showImage" value="1" <?php checked( $options['widget_showImage'], 1 ); ?> />
-				    | Image Width: 
+				    | Image Width:
 				     	<input type="text" name="widget_imageSize" value="<?php echo $options["widget_imageSize"]; ?>" size="5">
 				    <p class="description">
 						For Image Width be sure to include px, %, or some other form of measurement for size.
 					</p>
 				</p>
 				<p>Show End Time
-						<input type="checkbox" name="widget_showEndTime" value="1" <?php checked( $options['widget_showEndTime'], 1 ); ?> /> 
+						<input type="checkbox" name="widget_showEndTime" value="1" <?php checked( $options['widget_showEndTime'], 1 ); ?> />
 					 | Show Location
 						<input type="checkbox" name="widget_showLocation" value="1" <?php checked( $options['widget_showLocation'], 1 ); ?> />
 					 | Show Time Zone Always
-						<input type="checkbox" name="widget_showTimeZone" value="1" <?php checked( $options['widget_showTimeZone'], 1 ); ?> /> 
-					 | Home Timezone: 
-					 	<input type="text" name="widget_homeTimeZone" value="<?php echo $options["widget_homeTimeZone"]; ?>" size="5"> 				 
+						<input type="checkbox" name="widget_showTimeZone" value="1" <?php checked( $options['widget_showTimeZone'], 1 ); ?> />
+					 | Home Timezone:
+					 	<input type="text" name="widget_homeTimeZone" value="<?php echo $options["widget_homeTimeZone"]; ?>" size="5">
 				</p>
 				<p class="description">
 						Show Time Zone Always: Select this if you always want to show the timezone on the homepage widget. Else, it will only show the timezone if it is not the timezone specified as 'Home Timezone'.
 				</p>
-				
+
 				<p>
 					<p>Priority I - Categories:
 						<input type="text" name="widget_categories1" value="<?php echo $options["widget_categories1"]; ?>" size="40">
@@ -437,23 +441,23 @@ function y_cal_settings() {
 
 					<p>Priority III:
 						Pull From General Calendar
-							<input type="checkbox" name="widget_priority3" value="1" <?php checked( $options['widget_priority3'], 1 ); ?> /> 
+							<input type="checkbox" name="widget_priority3" value="1" <?php checked( $options['widget_priority3'], 1 ); ?> />
 						| Show Unfeatured Events
-							<input type="checkbox" name="widget_showUnfeatured" value="1" <?php checked( $options['widget_showUnfeatured'], 1 ); ?> /> 
+							<input type="checkbox" name="widget_showUnfeatured" value="1" <?php checked( $options['widget_showUnfeatured'], 1 ); ?> />
 						| Show Events Not On Main Calander
-							<input type="checkbox" name="widget_showUnMainCalendar" value="1" <?php checked( $options['widget_showUnMainCalendar'], 1 ); ?> /> 
+							<input type="checkbox" name="widget_showUnMainCalendar" value="1" <?php checked( $options['widget_showUnMainCalendar'], 1 ); ?> />
 					</p>
 
 					<p class="description">
 							Priority I will show all events from the specified categories. Then, if the number of events in Priority I is less than the number of events to show on the widget Priority II categories are inserted.<br/>
 						Categories must be separated by commas (ex: "72,74,75,76,77,70,78,79", excluding quotations). <br/>
 						You must use specific category ids. <br/>
-						A list of categorie ids are found in <a href="https://calendar-test.byu.edu/introduction">BYU's API Documentation</a>.</p>
+						A list of categorie ids are found in <a href="https://calendar.byu.edu/introduction">BYU's API Documentation</a>.</p>
 					</p>
 				</p>
-				
 
-			
+
+
 			<hr />
 				<h3>Calendar Settings</h3>
 				<p>URL:
@@ -473,7 +477,7 @@ function y_cal_settings() {
 				<p>Image Prefix:
 					<input type="text" name="image_prefix" value="<?php echo $options["image_prefix"]; ?>" size="40">
 				</p>
-				<p>Import Range: 
+				<p>Import Range:
 				Years
 					<input type="text" name="getYears" value="<?php echo $options["getYears"]; ?>" size="5">
 					Months
@@ -486,19 +490,19 @@ function y_cal_settings() {
 
 			</form>
 			<div>
-				<p>This plugin is provided to sync the BYU calander with WordPress. The API documentation for BYU's Calander can be found at <a href="https://calendar-test.byu.edu/introduction">https://calendar-test.byu.edu/introduction</a>.
+				<p>This plugin is provided to sync the BYU calander with WordPress. The API documentation for BYU's Calander can be found at <a href="https://calendar.byu.edu/introduction">https://calendar.byu.edu/introduction</a>.
 			</div>
 
 
 
-			
+
 			</div>
 
 			<script type="text/javascript">
 			//Add functionality to force refesh button on settings page
 				document.getElementById("ForceRefresh").onclick = doFunction
 			</script>
-			
+
 
 	<?php
 }

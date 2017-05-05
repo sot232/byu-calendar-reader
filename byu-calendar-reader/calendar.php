@@ -64,10 +64,10 @@ function getCalendarData($category_filter = "", $show_byu = false) {
 	if ($category_filter != "") {
 		$strSQL .= " AND " . $options['table_name'] . ".DeptIds IN (" . $category_filter . ")";
 		if ($show_byu) {
-			$strSQL .= " OR " . $options['table_name'] . ".DeptIds<>('288,275,276,277,278,279,280,281')";
+			$strSQL .= " OR " . $options['table_name'] . ".IsPublishedNotMainCalendar=1";
 		}
 	} else if ($show_byu) {
-		$strSQL .= " AND " . $options['table_name'] . ".DeptIds<>('288,275,276,277,278,279,280,281')";
+		$strSQL .= " AND " . $options['table_name'] . ".IsPublishedNotMainCalendar=1";
 	}
    
 	$strSQL .= " ORDER BY " . $options['table_name'] . ".StartDateTime ASC ";
@@ -323,7 +323,7 @@ function y_cal_build_cal($category_filter = "", $show_byu = false) {
 							</div>";						
 						} else {
 	$builder .=				"<div class='Ycal-calendar-imageDiv'>
-							<a href='" . $calendarURL . "' class='Ycal-calendar-title'><img src='" .get_default_image($event['CategoryId']) . "' alt='" . $event['ImgAlt'] . "' class='Ycal-calendar-image' style='width:" . $options['calendar_imageSize'] . ";'></a>
+							<a href='" . $calendarURL . "' class='Ycal-calendar-title'><img src='" .get_default_image($event['DeptIds']) . "' alt='" . $event['ImgAlt'] . "' class='Ycal-calendar-image' style='width:" . $options['calendar_imageSize'] . ";'></a>
 							</div>";						
 						}
 // Text Div
