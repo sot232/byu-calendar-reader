@@ -10,12 +10,12 @@ require_once dirname( __FILE__ ) . '/calendar.php';
  * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
  * Description: Specificly made to import and show BYU calendar.
  * Version: 1.0.0
- * Author: Matthew Shurtz
- * Author URI: http://www.MattShurtz.com
+ * Author: BYU CPMS
+ * Author URI: http://cpms.byu.edu
  * License: GPL2
  */
 
- /*  Copyright 2015  Matthew Shurtz  (email : shurtzm@byu.edu)
+ /*  Copyright 2015  BYU College of Physical and Mathematical Sciences
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
